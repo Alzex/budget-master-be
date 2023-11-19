@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Inject,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -21,10 +22,12 @@ export class AuthGuard implements CanActivate {
 
     const token = request.headers.authorization.split(' ')[1];
 
-    const payload = this.authService.validate(token);
+    let payload;
 
-    if (!payload) {
-      throw new UnauthorizedException('Invalid auth token');
+    try {
+      payload = this.authService.validate(token);
+    } catch (e) {
+      throw new ForbiddenException(`Invalid token: ${e.message}`);
     }
 
     request.userId = payload.sub;
