@@ -20,15 +20,7 @@ export function ThroughCache(ttl?: number): MethodDecorator {
         );
       }
 
-      const value = await this.cacheService.get(key);
-
-      if (value) {
-        return value;
-      }
-
-      const result = await originalMethod.apply(this, args);
-      await this.cacheService.set(key, result, ttl);
-      return result;
+      return this.cacheService.wrap(key, originalMethod.apply(this, args), ttl);
     };
   };
 }
