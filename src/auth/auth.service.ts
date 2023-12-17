@@ -30,8 +30,8 @@ export class AuthService {
     const salt = await bcrypt.genSalt();
     const hashed = await bcrypt.hash(dto.password, salt);
 
-    newUser.password_hash = hashed;
-    newUser.password_salt = salt;
+    newUser.passwordHash = hashed;
+    newUser.passwordSalt = salt;
 
     await this.usersService.createOne(newUser);
 
@@ -47,7 +47,7 @@ export class AuthService {
       throw new BadRequestException('Invalid username or password');
     }
 
-    const match = await bcrypt.compare(dto.password, user.password_hash);
+    const match = await bcrypt.compare(dto.password, user.passwordHash);
 
     if (!match) {
       throw new BadRequestException('Invalid username or password');

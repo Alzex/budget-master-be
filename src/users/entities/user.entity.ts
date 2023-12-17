@@ -1,30 +1,44 @@
 import { Entity, Enum, PrimaryKey, Property } from '@mikro-orm/core';
 import { UserRole } from '../enums/user-role.enum';
 import { UserRepository } from '../repositories/user.repository';
+import { BasicEntity } from '../../common/basic-entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({ repository: () => UserRepository })
-export class User {
+export class User extends BasicEntity {
   @PrimaryKey({ autoincrement: true })
+  @ApiProperty()
   id: number;
 
   @Property({ unique: true })
+  @ApiProperty()
   email: string;
 
   @Property({ nullable: true })
+  @ApiProperty()
   username?: string;
 
   @Enum(() => UserRole)
+  @ApiProperty({
+    enum: UserRole,
+  })
   role: UserRole;
 
   @Property({ hidden: true })
-  password_hash: string;
+  passwordHash: string;
 
   @Property({ hidden: true })
-  password_salt: string;
+  passwordSalt: string;
 
   @Property({ type: 'date' })
-  created_at: Date = new Date();
+  @ApiProperty({
+    type: Date,
+  })
+  createdAt: Date = new Date();
 
   @Property({ type: 'date', onUpdate: () => new Date() })
-  updated_at: Date = new Date();
+  @ApiProperty({
+    type: Date,
+  })
+  updatedAt: Date = new Date();
 }
