@@ -1,29 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CacheService } from '../cache/cache.service';
 import { UserRepository } from './repositories/user.repository';
 import { User } from './entities/user.entity';
 import { FindUserArgs } from './args/find-user.args';
 import { plainToInstance } from 'class-transformer';
+import { BasicCrudService } from '../common/basic-crud.service';
 
 @Injectable()
-export class UsersService {
+export class UsersService extends BasicCrudService<User> {
   constructor(
-    private readonly cacheService: CacheService,
-    private readonly userRepository: UserRepository,
-  ) {}
-
-  async findOne(args: Partial<User>): Promise<User | null> {
-    return this.userRepository.findOne(args);
+    protected readonly cacheService: CacheService,
+    protected readonly userRepository: UserRepository,
+  ) {
+    super(userRepository, cacheService);
   }
 
-  async createOne(args: Partial<User>): Promise<User> {
-    const user = this.userRepository.create(args);
+  async findOneByIdSafe(id: number): Promise<Partial<User>> {
+    const result = await this.findOne({ id });
 
-    await this.userRepository.upsert(user);
+    if (!result) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
 
-    return user;
+    return result.toSafeEntity();
   }
-
   async complexSearch(args: FindUserArgs): Promise<Partial<User>[]> {
     const query = this.userRepository.qb().select('*');
 

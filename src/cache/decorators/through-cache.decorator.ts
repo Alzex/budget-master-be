@@ -12,7 +12,10 @@ export function ThroughCache(ttl?: number): MethodDecorator {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: unknown[]) {
-      const key = `${propertyKey}:${md5(JSON.stringify(args)).slice(0, 8)}`;
+      const className = target.constructor.name;
+      const key = `${className}:${propertyKey}:${md5(
+        JSON.stringify(args),
+      ).slice(0, 8)}`;
 
       if (!this.cacheService) {
         throw new Error(

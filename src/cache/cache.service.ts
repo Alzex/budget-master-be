@@ -46,4 +46,21 @@ export class CacheService {
     await this.set(key, result, ttl);
     return result;
   }
+
+  async delete(key: string): Promise<void> {
+    try {
+      await this.redisClient.del(key);
+    } catch (error) {
+      this.logger.error(`REDIS DELETE FAILED: ${error.message}`);
+    }
+  }
+
+  async deletePattern(pattern: string): Promise<void> {
+    try {
+      const keys = await this.redisClient.keys(pattern);
+      await this.redisClient.del(...keys);
+    } catch (error) {
+      this.logger.error(`REDIS DELETE PATTERN FAILED: ${error.message}`);
+    }
+  }
 }
