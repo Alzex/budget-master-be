@@ -5,14 +5,16 @@ import { User } from './entities/user.entity';
 import { FindUserArgs } from './args/find-user.args';
 import { plainToInstance } from 'class-transformer';
 import { BasicCrudService } from '../common/basic-crud.service';
+import { EntityManager } from '@mikro-orm/core';
 
 @Injectable()
 export class UsersService extends BasicCrudService<User> {
   constructor(
     protected readonly cacheService: CacheService,
     protected readonly userRepository: UserRepository,
+    protected readonly entityManager: EntityManager,
   ) {
-    super(userRepository, cacheService);
+    super(User, userRepository, cacheService, entityManager);
   }
 
   async findOneByIdSafe(id: number): Promise<Partial<User>> {

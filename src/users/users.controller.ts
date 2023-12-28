@@ -4,18 +4,20 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { UserRole } from './enums/user-role.enum';
 import { RequiredRole } from '../auth/decorator/required-role.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
 import { FindUserArgs } from './args/find-user.args';
 import { UserMeta } from '../auth/decorator/user-meta.decorator';
 import { UserMetadata } from '../auth/types/user-metadata.type';
 
 @Controller('users')
+@UseGuards(AuthGuard)
+@ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @RequiredRole(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOkResponse({
@@ -23,12 +25,11 @@ export class UsersController {
     type: User,
     isArray: true,
   })
-  findAll(@Query() args?: FindUserArgs) {
+  findAll(@Query() args: FindUserArgs) {
     return this.usersService.complexSearch(args);
   }
 
   @Get('me')
-  @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({
     description: 'Returns the current user',

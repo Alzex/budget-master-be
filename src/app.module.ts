@@ -8,6 +8,9 @@ import { MikroOrmCoreModule } from '@mikro-orm/nestjs/mikro-orm-core.module';
 import { config } from './config';
 import defineConfig from './mikro-orm.config';
 import { JwtModule } from '@nestjs/jwt';
+import { LimitsModule } from './limits/limits.module';
+import { BalancesModule } from './balances/balances.module';
+import { CurrenciesModule } from './currencies/currencies.module';
 
 @Module({
   imports: [
@@ -20,6 +23,9 @@ import { JwtModule } from '@nestjs/jwt';
     }),
     UsersModule,
     AuthModule,
+    LimitsModule,
+    BalancesModule,
+    CurrenciesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

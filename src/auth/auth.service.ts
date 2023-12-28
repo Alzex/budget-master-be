@@ -7,6 +7,7 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { SignUpResultDto } from './dto/sign-up-result.dto';
 import { JwtDto } from './dto/jwt.dto';
 import { JwtService } from '@nestjs/jwt';
+import { UserRole } from '../users/enums/user-role.enum';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +27,7 @@ export class AuthService {
 
     newUser.email = dto.email;
     newUser.username = dto.username;
+    newUser.role = UserRole.USER;
 
     const salt = await bcrypt.genSalt();
     const hashed = await bcrypt.hash(dto.password, salt);
