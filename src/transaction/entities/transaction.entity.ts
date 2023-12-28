@@ -1,17 +1,17 @@
-import {
-  Entity,
-  ManyToOne,
-  OneToOne,
-  PrimaryKey,
-  Property,
-} from '@mikro-orm/core';
-import { BasicEntity } from '../../common/basic-entity';
-import { TargetRepository } from '../repositories/target.repository';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '../../users/entities/user.entity';
 
-@Entity({ repository: () => TargetRepository })
-export class Target extends BasicEntity {
+import { BasicEntity } from '../../common/basic-entity';
+import { User } from '../../users/entities/user.entity';
+import { TransactionRepository } from '../repositories/transaction.repository';
+import { Balance } from '../../balances/entities/balance.entity';
+import { Target } from '../../target/entities/target.entity';
+
+@Entity({
+  repository: () => TransactionRepository,
+  tableName: 'transactions',
+})
+export class Transaction extends BasicEntity {
   @PrimaryKey({ autoincrement: true })
   @ApiProperty()
   id: number;
@@ -26,7 +26,7 @@ export class Target extends BasicEntity {
 
   @Property({ nullable: false })
   @ApiProperty()
-  balnceId: number;
+  balanceId: number;
 
   @Property({ nullable: false })
   @ApiProperty()
@@ -50,9 +50,9 @@ export class Target extends BasicEntity {
   @ManyToOne(() => User)
   user: User;
 
-  @OneToOne(() => Target)
+  @ManyToOne(() => Target)
   target: Target;
 
-  @ManyToOne(() => Category)
-  category: Category;
+  // @ManyToOne(() => Category)
+  // category: Category;
 }

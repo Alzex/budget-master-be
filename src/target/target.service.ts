@@ -1,24 +1,27 @@
 import { Injectable } from '@nestjs/common';
+import { EntityManager } from '@mikro-orm/core';
+
 import { CacheService } from '../cache/cache.service';
 import { TargetRepository } from './repositories/target.repository';
 import { Target } from './entities/target.entity';
 import { BasicCrudService } from '../common/basic-crud.service';
 import { CreateTargetDto } from './dto/create-target.dto';
-import { UsersService } from '../users/users.service';
 import { UpdateTargetDto } from './dto/update-target.dto';
+import { UsersService } from '../users/users.service';
+
 @Injectable()
 export class TargetService extends BasicCrudService<Target> {
   constructor(
     protected readonly cacheService: CacheService,
     protected readonly targetRepository: TargetRepository,
-    private readonly UsersService: UsersService,
+    protected readonly entityManager: EntityManager,
+    private readonly usersService: UsersService,
   ) {
-    super(targetRepository, cacheService);
+    super(Target, targetRepository, cacheService, entityManager);
   }
 
-  async findAllbyUserId(userId: number): Promise<Partial<Target>[]> {
-    await this.UsersService.findOneByIdSafe(userId);
-    const result = await this.findMany({ userId });
+  async findAllByUserId(userId: number): Promise<Partial<Target>[]> {
+    const result = await this.findManyCached({ userId });
     return result.map((target) => target.toSafeEntity());
   }
 
@@ -26,7 +29,7 @@ export class TargetService extends BasicCrudService<Target> {
     userId: number,
     createTargetDto: CreateTargetDto,
   ): Promise<Target> {
-    await this.UsersService.findOneByIdSafe(userId);
+    await this.usersService.findOneByIdSafe(userId);
     return this.createOne(createTargetDto);
   }
 
@@ -34,12 +37,16 @@ export class TargetService extends BasicCrudService<Target> {
     userId: number,
     updateTargetDto: UpdateTargetDto,
   ): Promise<Target> {
-    await this.UsersService.findOneByIdSafe(userId);
-    return this.update(updateTargetDto.id, updateTargetDto);
+    await this.usersService.findOneByIdSafe(userId);
+    return this.updateOne(
+      {
+        id: updateTargetDto.id,
+      },
+      updateTargetDto,
+    );
   }
 
-  async deleteTarget(userId: number, id: number): Promise<number> {
-    await this.UsersService.findOneByIdSafe(userId);
-    return this.delete({ id });
+  async deleteTarget(id: number): Promise<Target> {
+    return this.deleteOne({ id });
   }
 }

@@ -7,11 +7,9 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { TargetService } from './target.service';
-import { Target } from './entities/target.entity';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import { Target } from './entities/target.entity';
@@ -32,8 +30,8 @@ export class TargetController {
     type: Target,
     isArray: true,
   })
-  findAllbyUserId(@UserMeta() meta: UserMetadata) {
-    return this.targetService.findAllbyUserId(meta.userId);
+  findAllByUserId(@UserMeta() meta: UserMetadata) {
+    return this.targetService.findAllByUserId(meta.userId);
   }
 
   @Post()
@@ -71,10 +69,7 @@ export class TargetController {
     description: 'Deleted a target',
     type: Target,
   })
-  deleteTarget(
-    @UserMeta() meta: UserMetadata,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.targetService.deleteTarget(meta.userId, id);
+  deleteTarget(@Param('id', ParseIntPipe) id: number) {
+    return this.targetService.deleteTarget(id);
   }
 }

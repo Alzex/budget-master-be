@@ -1,4 +1,4 @@
 import { EntityRepository } from '@mikro-orm/mysql';
-import { Transaction } from '../entities/target.entity';
+import { Transaction } from '../entities/transaction.entity';
 
-export class TargetRepository extends EntityRepository<Transaction> {}
+export class TransactionRepository extends EntityRepository<Transaction> {}

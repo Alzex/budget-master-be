@@ -4,6 +4,7 @@ import { CacheService } from '../cache/cache.service';
 import {
   EntityManager,
   FilterQuery,
+  FindOptions,
   RequiredEntityData,
 } from '@mikro-orm/core';
 import { ThroughCache } from '../cache/decorators/through-cache.decorator';
@@ -17,23 +18,32 @@ export class BasicCrudService<T extends BasicEntity> {
     protected readonly entityManager: EntityManager,
   ) {}
 
-  async findOne(args: FilterQuery<T>): Promise<T> {
-    return this.entityRepository.findOne(args);
+  async findOne(args: FilterQuery<T>, options?: FindOptions<T>): Promise<T> {
+    return this.entityRepository.findOne(args, options);
   }
 
   // 1 minute
   @ThroughCache(60)
-  async findOneCached(args?: FilterQuery<T>): Promise<T> {
-    return this.findOne(args);
+  async findOneCached(
+    args?: FilterQuery<T>,
+    options?: FindOptions<T>,
+  ): Promise<T> {
+    return this.findOne(args, options);
   }
 
-  async findMany(args?: FilterQuery<T>): Promise<T[]> {
-    return this.entityRepository.find(args);
+  async findMany(
+    args?: FilterQuery<T>,
+    options?: FindOptions<T>,
+  ): Promise<T[]> {
+    return this.entityRepository.find(args, options);
   }
 
   @ThroughCache(60)
-  async findManyCached(args?: FilterQuery<T>): Promise<T[]> {
-    return this.findMany(args);
+  async findManyCached(
+    args?: FilterQuery<T>,
+    options?: FindOptions<T, never>,
+  ): Promise<T[]> {
+    return this.findMany(args, options);
   }
 
   async upsert(entity: Partial<T>): Promise<T> {
