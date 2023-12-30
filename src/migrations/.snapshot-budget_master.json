@@ -12,6 +12,51 @@
           "nullable": false,
           "mappedType": "integer"
         },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        }
+      },
+      "name": "category",
+      "indexes": [
+        {
+          "columnNames": [
+            "name"
+          ],
+          "composite": false,
+          "keyName": "category_name_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
         "code": {
           "name": "code",
           "type": "varchar(3)",
@@ -44,60 +89,6 @@
           "primary": false,
           "unique": true
         },
-        {
-          "keyName": "PRIMARY",
-          "columnNames": [
-            "id"
-          ],
-          "composite": false,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {}
-    },
-    {
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "unsigned": true,
-          "autoincrement": true,
-          "primary": true,
-          "nullable": false,
-          "mappedType": "integer"
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "string"
-        },
-        "max_loss": {
-          "name": "max_loss",
-          "type": "int",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "integer"
-        },
-        "days": {
-          "name": "days",
-          "type": "int",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "integer"
-        }
-      },
-      "name": "limits",
-      "indexes": [
         {
           "keyName": "PRIMARY",
           "columnNames": [
@@ -278,15 +269,6 @@
       "indexes": [
         {
           "columnNames": [
-            "name"
-          ],
-          "composite": false,
-          "keyName": "target_name_unique",
-          "primary": false,
-          "unique": true
-        },
-        {
-          "columnNames": [
             "user_id"
           ],
           "composite": false,
@@ -331,8 +313,17 @@
           "nullable": false,
           "mappedType": "integer"
         },
-        "amount": {
-          "name": "amount",
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "max_loss": {
+          "name": "max_loss",
           "type": "int",
           "unsigned": false,
           "autoincrement": false,
@@ -340,13 +331,82 @@
           "nullable": false,
           "mappedType": "integer"
         },
-        "currency_id": {
-          "name": "currency_id",
+        "until": {
+          "name": "until",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        },
+        "user_id": {
+          "name": "user_id",
           "type": "int",
           "unsigned": true,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "mappedType": "integer"
+        }
+      },
+      "name": "limits",
+      "indexes": [
+        {
+          "columnNames": [
+            "user_id"
+          ],
+          "composite": false,
+          "keyName": "limits_user_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "limits_user_id_foreign": {
+          "constraintName": "limits_user_id_foreign",
+          "columnNames": [
+            "user_id"
+          ],
+          "localTableName": "limits",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "user",
+          "updateRule": "cascade"
+        }
+      }
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "amount": {
+          "name": "amount",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0",
           "mappedType": "integer"
         },
         "user_id": {
@@ -365,6 +425,15 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "mappedType": "integer"
+        },
+        "currency_id": {
+          "name": "currency_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
           "mappedType": "integer"
         }
       },
@@ -431,6 +500,7 @@
             "id"
           ],
           "referencedTableName": "limits",
+          "deleteRule": "set null",
           "updateRule": "cascade"
         },
         "balances_currency_id_foreign": {
@@ -460,12 +530,16 @@
         },
         "type": {
           "name": "type",
-          "type": "varchar(255)",
+          "type": "enum('debit','credit')",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "string"
+          "enumItems": [
+            "debit",
+            "credit"
+          ],
+          "mappedType": "enum"
         },
         "amount": {
           "name": "amount",
@@ -475,6 +549,16 @@
           "primary": false,
           "nullable": false,
           "mappedType": "integer"
+        },
+        "ignore_limit": {
+          "name": "ignore_limit",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "false",
+          "mappedType": "boolean"
         },
         "balance_id": {
           "name": "balance_id",
@@ -500,26 +584,17 @@
           "unsigned": true,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "mappedType": "integer"
         },
         "category_id": {
           "name": "category_id",
           "type": "int",
-          "unsigned": false,
+          "unsigned": true,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "mappedType": "integer"
-        },
-        "ignore": {
-          "name": "ignore",
-          "type": "tinyint(1)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "boolean"
         }
       },
       "name": "transactions",
@@ -548,6 +623,15 @@
           ],
           "composite": false,
           "keyName": "transactions_target_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "category_id"
+          ],
+          "composite": false,
+          "keyName": "transactions_category_id_index",
           "primary": false,
           "unique": false
         },
@@ -597,6 +681,19 @@
             "id"
           ],
           "referencedTableName": "target",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "transactions_category_id_foreign": {
+          "constraintName": "transactions_category_id_foreign",
+          "columnNames": [
+            "category_id"
+          ],
+          "localTableName": "transactions",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "category",
           "updateRule": "cascade"
         }
       }

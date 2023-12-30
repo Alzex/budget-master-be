@@ -11,6 +11,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { LimitsModule } from './limits/limits.module';
 import { BalancesModule } from './balances/balances.module';
 import { CurrenciesModule } from './currencies/currencies.module';
+import { CategoryModule } from './category/category.module';
+import { TransactionModule } from './transaction/transaction.module';
+import { TargetModule } from './target/target.module';
 
 @Module({
   imports: [
@@ -26,6 +29,9 @@ import { CurrenciesModule } from './currencies/currencies.module';
     LimitsModule,
     BalancesModule,
     CurrenciesModule,
+    CategoryModule,
+    TransactionModule,
+    TargetModule,
   ],
   controllers: [AppController],
   providers: [AppService],

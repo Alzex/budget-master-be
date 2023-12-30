@@ -3,28 +3,20 @@ import { BasicEntity } from '../../common/basic-entity';
 import { User } from '../../users/entities/user.entity';
 import { Limit } from '../../limits/entities/limit.entity';
 import { Currency } from '../../currencies/entities/currency.entity';
+import { BalanceRepository } from '../repositories/balance.repository';
 
-@Entity({ tableName: 'balances' })
+@Entity({ tableName: 'balances', repository: () => BalanceRepository })
 export class Balance extends BasicEntity {
   @PrimaryKey({ autoincrement: true })
   id: number;
 
-  @Property()
-  amount: number;
-
-  @Property()
-  currencyId: string;
-
-  @Property()
-  userId: number;
-
-  @Property({ nullable: true })
-  limitId: number;
+  @Property({ default: 0 })
+  amount: number = 0;
 
   @ManyToOne(() => User)
   user: User;
 
-  @ManyToOne(() => Limit)
+  @ManyToOne(() => Limit, { nullable: true })
   limit: Limit;
 
   @ManyToOne(() => Currency)
