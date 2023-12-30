@@ -9,16 +9,18 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+
 import { TargetService } from './target.service';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import { Target } from './entities/target.entity';
 import { UserMeta } from '../auth/decorator/user-meta.decorator';
 import { UserMetadata } from '../auth/types/user-metadata.type';
 import { CreateTargetDto } from './dto/create-target.dto';
-import { UpdateTargetDto } from './dto/update-Target.dto';
+import { UpdateTargetDto } from './dto/update-target.dto';
 
 @Controller('target')
+@ApiTags('target')
 export class TargetController {
   constructor(private readonly targetService: TargetService) {}
 
@@ -31,7 +33,7 @@ export class TargetController {
     isArray: true,
   })
   findAllByUserId(@UserMeta() meta: UserMetadata) {
-    return this.targetService.findAllByUserId(meta.userId);
+    return this.targetService.find(meta);
   }
 
   @Post()
@@ -45,7 +47,7 @@ export class TargetController {
     @UserMeta() meta: UserMetadata,
     @Body() createTargetDto: CreateTargetDto,
   ) {
-    return this.targetService.createTarget(meta.userId, createTargetDto);
+    return this.targetService.createTarget(createTargetDto, meta);
   }
 
   @Patch()
@@ -59,7 +61,7 @@ export class TargetController {
     @UserMeta() meta: UserMetadata,
     @Body() updateTargetDto: UpdateTargetDto,
   ) {
-    return this.targetService.updateTarget(meta.userId, updateTargetDto);
+    return this.targetService.updateTarget(updateTargetDto, meta);
   }
 
   @Delete(':id')
@@ -69,7 +71,10 @@ export class TargetController {
     description: 'Deleted a target',
     type: Target,
   })
-  deleteTarget(@Param('id', ParseIntPipe) id: number) {
-    return this.targetService.deleteTarget(id);
+  deleteTarget(
+    @Param('id', ParseIntPipe) id: number,
+    @UserMeta() meta: UserMetadata,
+  ) {
+    return this.targetService.deleteTarget(id, meta);
   }
 }

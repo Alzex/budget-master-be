@@ -8,6 +8,9 @@ import { BasicCrudService } from '../common/basic-crud.service';
 import { CreateTargetDto } from './dto/create-target.dto';
 import { UpdateTargetDto } from './dto/update-target.dto';
 import { UsersService } from '../users/users.service';
+import { UserMetadata } from '../auth/types/user-metadata.type';
+import { UserRole } from '../users/enums/user-role.enum';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class TargetService extends BasicCrudService<Target> {
@@ -20,33 +23,70 @@ export class TargetService extends BasicCrudService<Target> {
     super(Target, targetRepository, cacheService, entityManager);
   }
 
-  async findAllByUserId(userId: number): Promise<Partial<Target>[]> {
-    const result = await this.findManyCached({ userId });
-    return result.map((target) => target.toSafeEntity());
+  async find(meta: UserMetadata): Promise<Partial<Target>[]> {
+    const filter: Partial<Target> = {};
+
+    if (meta.userRole === UserRole.USER) {
+      filter.user = this.entityManager.getReference(User, meta.userId);
+    }
+
+    return this.findMany(filter);
+  }
+
+  async findOneSafe(id: number, meta?: UserMetadata): Promise<Target> {
+    const filter: Partial<Target> = { id };
+
+    if (meta.userRole === UserRole.USER) {
+      filter.user = this.entityManager.getReference(User, meta.userId);
+    }
+
+    return this.findOneOrFail(filter);
   }
 
   async createTarget(
-    userId: number,
     createTargetDto: CreateTargetDto,
+    meta: UserMetadata,
   ): Promise<Target> {
-    await this.usersService.findOneByIdSafe(userId);
-    return this.createOne(createTargetDto);
+    let { userId } = meta;
+
+    if (meta.userRole === UserRole.USER) {
+      userId = createTargetDto.userId ?? meta.userId;
+    }
+
+    return this.createOne({
+      name: createTargetDto.name,
+      description: createTargetDto.description,
+      until: createTargetDto.until,
+      targetQuantity: createTargetDto.targetQuantity,
+      user: this.entityManager.getReference(User, userId),
+    });
   }
 
   async updateTarget(
-    userId: number,
     updateTargetDto: UpdateTargetDto,
+    meta: UserMetadata,
   ): Promise<Target> {
-    await this.usersService.findOneByIdSafe(userId);
-    return this.updateOne(
-      {
-        id: updateTargetDto.id,
-      },
-      updateTargetDto,
-    );
+    const filter: Partial<Target> = { id: updateTargetDto.id };
+
+    if (meta.userRole === UserRole.USER) {
+      filter.user = this.entityManager.getReference(User, meta.userId);
+    }
+
+    return this.updateOne(filter, {
+      name: updateTargetDto.name,
+      description: updateTargetDto.description,
+      until: updateTargetDto.until,
+      targetQuantity: updateTargetDto.targetQuantity,
+    });
   }
 
-  async deleteTarget(id: number): Promise<Target> {
-    return this.deleteOne({ id });
+  async deleteTarget(id: number, meta: UserMetadata): Promise<Target> {
+    const filter: Partial<Target> = { id };
+
+    if (meta.userRole === UserRole.USER) {
+      filter.user = this.entityManager.getReference(User, meta.userId);
+    }
+
+    return this.deleteOne(filter);
   }
 }

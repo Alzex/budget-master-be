@@ -10,7 +10,7 @@ export class Target extends BasicEntity {
   @ApiProperty()
   id: number;
 
-  @Property({ unique: true })
+  @Property()
   @ApiProperty()
   name: string;
 
@@ -18,7 +18,7 @@ export class Target extends BasicEntity {
   @ApiProperty()
   description?: string;
 
-  @Property()
+  @Property({ type: 'date' })
   @ApiProperty({
     type: Date,
   })
@@ -27,10 +27,6 @@ export class Target extends BasicEntity {
   @Property()
   @ApiProperty()
   targetQuantity: number;
-
-  @Property()
-  @ApiProperty()
-  userId: number;
 
   @ManyToOne(() => User)
   user: User;
