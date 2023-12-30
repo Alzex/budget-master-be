@@ -1,8 +1,17 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+  Collection,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { BasicEntity } from '../../common/basic-entity';
 import { LimitsRepository } from '../repositories/limits.repository';
+import { Balance } from '../../balances/entities/balance.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity({ tableName: 'limits', repository: () => LimitsRepository })
 export class Limit extends BasicEntity {
@@ -19,6 +28,12 @@ export class Limit extends BasicEntity {
   maxLoss: number;
 
   @Property()
-  @ApiProperty()
-  days: number;
+  @ApiProperty({ required: true })
+  until: Date;
+
+  @OneToMany(() => Balance, (balance) => balance.limit)
+  balances = new Collection<Balance>(this);
+
+  @ManyToOne(() => User)
+  user?: User;
 }

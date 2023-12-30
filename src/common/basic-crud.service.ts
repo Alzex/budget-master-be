@@ -19,7 +19,22 @@ export class BasicCrudService<T extends BasicEntity> {
   ) {}
 
   async findOne(args: FilterQuery<T>, options?: FindOptions<T>): Promise<T> {
-    return this.entityRepository.findOne(args, options);
+    return this.entityRepository.findOne(args, { ...options, populate: true });
+  }
+
+  async findOneOrFail(
+    args: FilterQuery<T>,
+    options?: FindOptions<T>,
+  ): Promise<T> {
+    try {
+      const result = await this.entityRepository.findOneOrFail(args, {
+        ...options,
+        populate: true,
+      });
+      return result;
+    } catch (e) {
+      throw new NotFoundException(`${this.entityClass.name} not found`);
+    }
   }
 
   // 1 minute
@@ -35,7 +50,10 @@ export class BasicCrudService<T extends BasicEntity> {
     args?: FilterQuery<T>,
     options?: FindOptions<T>,
   ): Promise<T[]> {
-    return this.entityRepository.find(args, options);
+    return this.entityRepository.find(args, {
+      ...options,
+      populate: true,
+    });
   }
 
   @ThroughCache(60)
@@ -46,12 +64,14 @@ export class BasicCrudService<T extends BasicEntity> {
     return this.findMany(args, options);
   }
 
-  async upsert(entity: Partial<T>): Promise<T> {
+  async upsert(entity: RequiredEntityData<T>): Promise<T> {
+    const newEntity = this.entityRepository.create(entity);
+
     await Promise.all([
       this.flushCrudCache(),
-      this.entityManager.upsert(entity),
+      this.entityManager.upsert(newEntity),
     ]);
-    return this.findOne(entity as FilterQuery<T>);
+    return this.findOne(newEntity as FilterQuery<T>);
   }
 
   async createOne(data: RequiredEntityData<T>): Promise<T> {
@@ -62,7 +82,7 @@ export class BasicCrudService<T extends BasicEntity> {
       this.entityRepository.nativeInsert(entity as T),
     ]);
 
-    return entity;
+    return this.findOne(entity as FilterQuery<T>);
   }
 
   async updateOne(
@@ -82,7 +102,7 @@ export class BasicCrudService<T extends BasicEntity> {
       this.entityRepository.nativeUpdate(args, data),
     ]);
 
-    return Object.assign(entity, data);
+    return this.findOne(entity);
   }
 
   async deleteOne(args: FilterQuery<T>): Promise<T> {
