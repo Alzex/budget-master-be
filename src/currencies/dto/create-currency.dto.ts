@@ -1,9 +1,9 @@
-import { IsString, Max } from 'class-validator';
+import { IsString, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCurrencyDto {
   @IsString()
-  @Max(3)
+  @MaxLength(3)
   @ApiProperty({
     maxLength: 3,
     description: 'Currency ISO code',

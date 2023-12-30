@@ -67,7 +67,6 @@ export class AuthService {
   }
 
   validate(token: string) {
-    const payload = this.jwtService.verify(token);
-    return payload;
+    return this.jwtService.verify(token);
   }
 }

@@ -9,5 +9,6 @@ import { Currency } from './entities/currency.entity';
   imports: [MikroOrmModule.forFeature([Currency])],
   controllers: [CurrenciesController],
   providers: [CurrenciesService],
+  exports: [CurrenciesService],
 })
 export class CurrenciesModule {}

@@ -58,6 +58,11 @@ export class CacheService {
   async deletePattern(pattern: string): Promise<void> {
     try {
       const keys = await this.redisClient.keys(pattern);
+
+      if (!keys.length) {
+        return;
+      }
+
       await this.redisClient.del(...keys);
     } catch (error) {
       this.logger.error(`REDIS DELETE PATTERN FAILED: ${error.message}`);

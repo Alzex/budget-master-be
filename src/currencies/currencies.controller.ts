@@ -45,8 +45,10 @@ export class CurrenciesController {
     description: 'Currency has been successfully created',
     type: Currency,
   })
-  create(@Body() createCurrencyDto: CreateCurrencyDto) {
-    return this.currenciesService.upsert(createCurrencyDto);
+  async create(@Body() createCurrencyDto: CreateCurrencyDto) {
+    const result = await this.currenciesService.upsert(createCurrencyDto);
+    console.log(result);
+    return result;
   }
 
   @Delete(':id')
