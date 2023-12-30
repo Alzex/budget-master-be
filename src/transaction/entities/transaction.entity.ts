@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, Enum, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { BasicEntity } from '../../common/basic-entity';
@@ -6,6 +6,8 @@ import { User } from '../../users/entities/user.entity';
 import { TransactionRepository } from '../repositories/transaction.repository';
 import { Balance } from '../../balances/entities/balance.entity';
 import { Target } from '../../target/entities/target.entity';
+import { Category } from '../../category/entities/category.entity';
+import { TransactionType } from '../enums/transaction-type.enum';
 
 @Entity({
   repository: () => TransactionRepository,
@@ -16,33 +18,17 @@ export class Transaction extends BasicEntity {
   @ApiProperty()
   id: number;
 
-  @Property({ nullable: false })
+  @Enum(() => TransactionType)
   @ApiProperty()
-  type: string;
+  type: TransactionType;
 
   @Property({ nullable: false })
   @ApiProperty()
   amount: number;
 
-  @Property({ nullable: false })
+  @Property({ default: false })
   @ApiProperty()
-  balanceId: number;
-
-  @Property({ nullable: false })
-  @ApiProperty()
-  userId: number;
-
-  @Property({ nullable: false })
-  @ApiProperty()
-  targetId: number;
-
-  @Property({ nullable: false })
-  @ApiProperty()
-  categoryId: number;
-
-  @Property({ nullable: false })
-  @ApiProperty()
-  ignore: boolean;
+  ignoreLimit: boolean;
 
   @ManyToOne(() => Balance)
   balance: Balance;
@@ -50,9 +36,9 @@ export class Transaction extends BasicEntity {
   @ManyToOne(() => User)
   user: User;
 
-  @ManyToOne(() => Target)
+  @ManyToOne(() => Target, { nullable: true })
   target: Target;
 
-  // @ManyToOne(() => Category)
-  // category: Category;
+  @ManyToOne(() => Category)
+  category: Category;
 }

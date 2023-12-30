@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import { TransactionType } from '../enums/transaction-type.enum';
 
-export class CreateTargetDto {
+export class CreateTransactionDto {
   @ApiProperty()
   @IsString()
-  type: string;
+  type: TransactionType;
 
   @ApiProperty()
   @IsNumber()
@@ -15,6 +16,7 @@ export class CreateTargetDto {
   balanceId: number;
 
   @ApiProperty()
+  @IsOptional()
   @IsNumber()
   userId: number;
 
@@ -28,5 +30,5 @@ export class CreateTargetDto {
 
   @ApiProperty()
   @IsBoolean()
-  ignore: boolean;
+  ignoreLimit: boolean;
 }
