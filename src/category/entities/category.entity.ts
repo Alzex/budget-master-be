@@ -1,4 +1,4 @@
-import { Entity, Enum, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
 import { CategoryRepository } from '../repositories/category.repository';
 import { BasicEntity } from '../../common/basic-entity';
 import { ApiProperty } from '@nestjs/swagger';

@@ -2,19 +2,18 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { CategoryRepository } from './repositories/category.repository';
 import { Category } from './entities/category.entity';
-import { EntityManager } from '@mikro-orm/core';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { CategoryService } from './category.service';
-import { UserMeta } from '../auth/decorator/user-meta.decorator';
-import { UserMetadata } from '../auth/types/user-metadata.type';
-import { CreateCategoryDto } from './dto/category-create.dto';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { RequiredRole } from '../auth/decorator/required-role.decorator';
+import { UserRole } from '../users/enums/user-role.enum';
 
 @Controller('category')
 @ApiTags('category')
@@ -22,16 +21,19 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
   @Post()
   @UseGuards(AuthGuard)
+  @RequiredRole(UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOkResponse({ description: 'Created a category', type: Category })
-  createCategory(
-    @UserMeta() meta: UserMetadata,
-    @Body() createCategoryDto: CreateCategoryDto,
-  ) {
-    return this.categoryService.createCategory(
-      meta.userRole,
-      createCategoryDto,
-    );
+  createCategory(@Body() createCategoryDto: CreateCategoryDto) {
+    return this.categoryService.create(createCategoryDto);
+  }
+
+  @Get()
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse({ description: 'Found all categories', type: Category })
+  findAllCategories() {
+    return this.categoryService.findMany();
   }
 
   @Delete(':id')
@@ -39,6 +41,6 @@ export class CategoryController {
   @ApiBearerAuth()
   @ApiOkResponse({ description: 'Deleted a category', type: Category })
   deleteCategory(@Param('id') id: number) {
-    return this.categoryService.deleteCategory(id);
+    return this.categoryService.deleteOne({ id });
   }
 }

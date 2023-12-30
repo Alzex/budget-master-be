@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Category } from './entities/category.entity';
 import { BasicCrudService } from '../common/basic-crud.service';
 import { CacheService } from '../cache/cache.service';
@@ -15,16 +15,14 @@ export class CategoryService extends BasicCrudService<Category> {
   ) {
     super(Category, categoryRepository, cacheService, entityManager);
   }
-  async createCategory(
-    userRole: string,
-    createCategoryDto: CreateCategoryDto,
-  ): Promise<Category> {
-    if (userRole !== 'ADMIN') {
-      throw new Error('Only admin can create categories');
+
+  async create(dto: CreateCategoryDto) {
+    const existing = await this.findOne({ name: dto.name });
+
+    if (existing) {
+      throw new BadRequestException('Category already exists');
     }
-    return this.createOne(createCategoryDto);
-  }
-  async deleteCategory(id: number): Promise<Category> {
-    return this.deleteOne({ id });
+
+    return this.createOne(dto);
   }
 }
