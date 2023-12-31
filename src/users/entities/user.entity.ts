@@ -1,8 +1,18 @@
-import { Entity, Enum, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+  Collection,
+  Entity,
+  Enum,
+  OneToMany,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
 import { UserRole } from '../enums/user-role.enum';
 import { UserRepository } from '../repositories/user.repository';
 import { BasicEntity } from '../../common/basic-entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Balance } from '../../balances/entities/balance.entity';
+import { Limit } from '../../limits/entities/limit.entity';
+import { Transaction } from '../../transaction/entities/transaction.entity';
 
 @Entity({ repository: () => UserRepository })
 export class User extends BasicEntity {
@@ -41,4 +51,13 @@ export class User extends BasicEntity {
     type: Date,
   })
   updatedAt: Date = new Date();
+
+  @OneToMany(() => Balance, (balance) => balance.user)
+  balances = new Collection<Balance>(this);
+
+  @OneToMany(() => Limit, (lim) => lim.user)
+  limits = new Collection<Limit>(this);
+
+  @OneToMany(() => Transaction, (trx) => trx.user)
+  transactions = new Collection<Transaction>(this);
 }

@@ -27,8 +27,8 @@ export class Limit extends BasicEntity {
   @ApiProperty()
   maxLoss: number;
 
-  @Property()
-  @ApiProperty({ required: true })
+  @Property({ nullable: true })
+  @ApiProperty({ required: false })
   until: Date;
 
   @OneToMany(() => Balance, (balance) => balance.limit)

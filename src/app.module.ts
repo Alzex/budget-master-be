@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { CacheModule } from './cache/cache.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
@@ -14,6 +12,7 @@ import { CurrenciesModule } from './currencies/currencies.module';
 import { CategoryModule } from './category/category.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { TargetModule } from './target/target.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -24,6 +23,14 @@ import { TargetModule } from './target/target.module';
       secret: config.jwtSecret,
       signOptions: { expiresIn: '1h' },
     }),
+    EventEmitterModule.forRoot({
+      wildcard: true,
+      delimiter: '.',
+      maxListeners: 10,
+      verboseMemoryLeak: true,
+      ignoreErrors: false,
+    }),
+
     UsersModule,
     AuthModule,
     LimitsModule,
@@ -33,7 +40,5 @@ import { TargetModule } from './target/target.module';
     TransactionModule,
     TargetModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

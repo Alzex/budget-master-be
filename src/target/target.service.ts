@@ -11,6 +11,9 @@ import { UsersService } from '../users/users.service';
 import { UserMetadata } from '../auth/types/user-metadata.type';
 import { UserRole } from '../users/enums/user-role.enum';
 import { User } from '../users/entities/user.entity';
+import { OnEvent } from '@nestjs/event-emitter';
+import { TransactionEvents } from '../transaction/enums/transaction-events.enum';
+import { Transaction } from '../transaction/entities/transaction.entity';
 
 @Injectable()
 export class TargetService extends BasicCrudService<Target> {
@@ -88,5 +91,25 @@ export class TargetService extends BasicCrudService<Target> {
     }
 
     return this.deleteOne(filter);
+  }
+
+  @OnEvent(TransactionEvents.CREDIT)
+  async onCreditEvent(trx: Transaction) {
+    if (!trx.target) return;
+
+    const { target } = trx;
+
+    if (target.currentQuantity === target.targetQuantity) return;
+
+    target.currentQuantity += trx.amount;
+
+    if (target.currentQuantity > target.targetQuantity) {
+      target.currentQuantity = target.targetQuantity;
+    }
+
+    await this.updateOne(
+      { id: target.id },
+      { currentQuantity: target.currentQuantity },
+    );
   }
 }

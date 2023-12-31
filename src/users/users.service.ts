@@ -6,6 +6,10 @@ import { FindUserArgs } from './args/find-user.args';
 import { plainToInstance } from 'class-transformer';
 import { BasicCrudService } from '../common/basic-crud.service';
 import { EntityManager } from '@mikro-orm/core';
+import { UserMetadata } from '../auth/types/user-metadata.type';
+import { TransactionType } from '../transaction/enums/transaction-type.enum';
+import { UserAnalyticsArgs } from './args/user-analytics.args';
+import moment from 'moment/moment';
 
 @Injectable()
 export class UsersService extends BasicCrudService<User> {
@@ -57,5 +61,40 @@ export class UsersService extends BasicCrudService<User> {
     const result = await query.execute();
 
     return result.map((user) => plainToInstance(User, user).toSafeEntity());
+  }
+
+  async calculateAnalytics(userId: number, args: UserAnalyticsArgs) {
+    const user = await this.findOneByIdSafe(userId);
+
+    let incomeTrx = user.transactions.filter(
+      (trx) => trx.type === TransactionType.CREDIT,
+    );
+
+    let expenseTrx = user.transactions.filter(
+      (trx) => trx.type === TransactionType.DEBIT,
+    );
+
+    if (args.from) {
+      incomeTrx = incomeTrx.filter((trx) =>
+        moment(trx.createdAt).isSameOrAfter(args.from),
+      );
+      expenseTrx = expenseTrx.filter((trx) =>
+        moment(trx.createdAt).isSameOrAfter(args.from),
+      );
+    }
+
+    if (args.to) {
+      incomeTrx = incomeTrx.filter((trx) =>
+        moment(trx.createdAt).isBefore(args.from),
+      );
+      expenseTrx = expenseTrx.filter((trx) =>
+        moment(trx.createdAt).isBefore(args.from),
+      );
+    }
+
+    return {
+      income: incomeTrx.reduce((acc, trx) => acc + trx.amount, 0),
+      expense: expenseTrx.reduce((acc, trx) => acc + trx.amount, 0),
+    };
   }
 }

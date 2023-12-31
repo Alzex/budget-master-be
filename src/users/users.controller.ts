@@ -9,6 +9,8 @@ import { User } from './entities/user.entity';
 import { FindUserArgs } from './args/find-user.args';
 import { UserMeta } from '../auth/decorator/user-meta.decorator';
 import { UserMetadata } from '../auth/types/user-metadata.type';
+import { UserAnalyticsDto } from './dto/user-analytics.dto';
+import { UserAnalyticsArgs } from './args/user-analytics.args';
 
 @Controller('users')
 @UseGuards(AuthGuard)
@@ -37,5 +39,18 @@ export class UsersController {
   })
   getMe(@UserMeta() meta: UserMetadata) {
     return this.usersService.findOneByIdSafe(meta.userId);
+  }
+
+  @Get('analytics')
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: 'Returns the current user',
+    type: User,
+  })
+  getAnalytics(
+    @Query() args: UserAnalyticsArgs,
+    @UserMeta() meta: UserMetadata,
+  ) {
+    return this.usersService.calculateAnalytics(meta.userId, args);
   }
 }

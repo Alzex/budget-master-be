@@ -79,7 +79,7 @@ export class BasicCrudService<T extends BasicEntity> {
 
     await Promise.all([
       this.flushCrudCache(),
-      this.entityRepository.nativeInsert(entity as T),
+      this.entityManager.persistAndFlush(entity as T),
     ]);
 
     return this.findOne(entity as FilterQuery<T>);

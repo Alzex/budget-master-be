@@ -48,12 +48,12 @@ export class BalancesService extends BasicCrudService<Balance> {
       );
     }
 
-    await Promise.all(checks);
+    const [user, currency, limit] = await Promise.all(checks);
 
     return this.createOne({
-      user: { id: userId },
-      currency: { id: currencyId },
-      limit: limitId ? { id: limitId } : undefined,
+      user,
+      currency,
+      limit,
     });
   }
 

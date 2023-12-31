@@ -242,7 +242,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 0,
           "mappedType": "datetime"
         },
@@ -255,6 +255,16 @@
           "nullable": false,
           "mappedType": "integer"
         },
+        "current_quantity": {
+          "name": "current_quantity",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0",
+          "mappedType": "integer"
+        },
         "user_id": {
           "name": "user_id",
           "type": "int",
@@ -263,6 +273,16 @@
           "primary": false,
           "nullable": false,
           "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
         }
       },
       "name": "target",
@@ -337,7 +357,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 0,
           "mappedType": "datetime"
         },
@@ -595,6 +615,16 @@
           "primary": false,
           "nullable": false,
           "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
         }
       },
       "name": "transactions",

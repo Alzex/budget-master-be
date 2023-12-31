@@ -18,16 +18,23 @@ export class Target extends BasicEntity {
   @ApiProperty()
   description?: string;
 
-  @Property({ type: 'date' })
+  @Property({ type: 'date', nullable: true })
   @ApiProperty({
     type: Date,
   })
-  until: Date = new Date();
+  until: Date;
 
   @Property()
   @ApiProperty()
   targetQuantity: number;
 
+  @Property()
+  @ApiProperty()
+  currentQuantity: number = 0;
+
   @ManyToOne(() => User)
   user: User;
+
+  @Property({ type: 'date', onCreate: () => new Date() })
+  createdAt: Date = new Date();
 }

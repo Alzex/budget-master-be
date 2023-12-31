@@ -7,6 +7,7 @@ import { UsersModule } from '../users/users.module';
 import { BalancesModule } from '../balances/balances.module';
 import { LimitsModule } from '../limits/limits.module';
 import { CategoryModule } from '../category/category.module';
+import { TargetModule } from '../target/target.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CategoryModule } from '../category/category.module';
     BalancesModule,
     LimitsModule,
     CategoryModule,
+    TargetModule,
   ],
   providers: [TransactionService],
   controllers: [TransactionController],

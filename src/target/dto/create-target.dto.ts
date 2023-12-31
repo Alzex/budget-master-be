@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNumber, IsString } from 'class-validator';
+import { IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
 export class CreateTargetDto {
   @ApiProperty()
   @IsString()
@@ -13,9 +13,10 @@ export class CreateTargetDto {
   @IsNumber()
   targetQuantity: number;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsNumber()
-  userId: number;
+  userId?: number;
 
   @ApiProperty()
   @IsString()

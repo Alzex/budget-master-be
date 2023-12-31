@@ -14,6 +14,10 @@ import { TransactionType } from './enums/transaction-type.enum';
 import { CategoryService } from '../category/category.service';
 import { Category } from '../category/entities/category.entity';
 import { User } from '../users/entities/user.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { TransactionEvents } from './enums/transaction-events.enum';
+import { Target } from '../target/entities/target.entity';
+import { TargetService } from '../target/target.service';
 
 @Injectable()
 export class TransactionService extends BasicCrudService<Transaction> {
@@ -24,6 +28,8 @@ export class TransactionService extends BasicCrudService<Transaction> {
     private readonly balancesService: BalancesService,
     private readonly usersService: UsersService,
     private readonly categoriesService: CategoryService,
+    private readonly eventEmitter: EventEmitter2,
+    private readonly targetService: TargetService,
   ) {
     super(Transaction, transactionRepository, cacheService, entityManager);
   }
@@ -51,6 +57,7 @@ export class TransactionService extends BasicCrudService<Transaction> {
   async create(dto: CreateTransactionDto, meta: UserMetadata) {
     let ownerId = meta.userId;
     let category: Category;
+    let target: Target;
 
     if (meta.userRole === UserRole.ADMIN) {
       ownerId = dto.userId ?? meta.userId;
@@ -61,6 +68,14 @@ export class TransactionService extends BasicCrudService<Transaction> {
       this.balancesService.findOneSafe(dto.balanceId, meta),
       this.categoriesService.findOneOrFail(dto.categoryId),
     ]);
+
+    if (dto.categoryId) {
+      category = await this.categoriesService.findOneOrFail(dto.categoryId);
+    }
+
+    if (dto.targetId) {
+      target = await this.targetService.findOneOrFail(dto.targetId);
+    }
 
     switch (dto.type) {
       case TransactionType.DEBIT:
@@ -83,17 +98,23 @@ export class TransactionService extends BasicCrudService<Transaction> {
         break;
     }
 
-    if (dto.categoryId) {
-      category = await this.categoriesService.findOneOrFail(dto.categoryId);
-    }
-
-    return this.createOne({
+    const res = await this.createOne({
       amount: dto.amount,
       ignoreLimit: dto.ignoreLimit,
       type: dto.type,
       user,
       balance,
       category,
+      target,
     });
+
+    this.eventEmitter.emitAsync(
+      dto.type === TransactionType.CREDIT
+        ? TransactionEvents.CREDIT
+        : TransactionEvents.DEBIT,
+      res,
+    );
+
+    return res;
   }
 }
