@@ -12,6 +12,7 @@ export const transactionCreditMock = {
   balance: balanceMock,
   user: userMock,
   target: targetMock,
+  toSafeEntity: jest.fn(),
 };
 
 export const transactionDebitMock = {

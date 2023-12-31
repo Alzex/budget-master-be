@@ -92,7 +92,7 @@ export class TargetService extends BasicCrudService<Target> {
   }
 
   @OnEvent(TransactionEvents.CREDIT)
-  async onCreditEvent(trx: Transaction) {
+  async onCreditEvent(trx: Partial<Transaction>) {
     if (!trx.target) return;
 
     const { target } = trx;
@@ -105,9 +105,11 @@ export class TargetService extends BasicCrudService<Target> {
       target.currentQuantity = target.targetQuantity;
     }
 
-    return this.updateOne(
+    await this.updateOne(
       { id: target.id },
       { currentQuantity: target.currentQuantity },
     );
+
+    return target;
   }
 }

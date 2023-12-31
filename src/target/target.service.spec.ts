@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TargetService } from './target.service';
-import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
-import { TransactionType } from '../transaction/enums/transaction-type.enum';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { transactionCreditMock } from '../common/mocks/transactions.mock';
 import { UsersService } from '../users/users.service';
 import { TargetRepository } from './repositories/target.repository';
@@ -11,7 +10,6 @@ import { CacheService } from '../cache/cache.service';
 
 describe('TargetService', () => {
   let service: TargetService;
-  let eventEmitter: EventEmitter2;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -24,7 +22,14 @@ describe('TargetService', () => {
         },
         {
           provide: TargetRepository,
-          useValue: null,
+          useValue: {
+            updateOne: jest.fn(),
+            findOneOrFail: jest.fn(),
+            findOne: jest.fn(),
+            create: jest.fn(),
+            remove: jest.fn(),
+            persistAndFlush: jest.fn(),
+          },
         },
         {
           provide: EntityManager,
@@ -38,17 +43,18 @@ describe('TargetService', () => {
     }).compile();
 
     service = module.get<TargetService>(TargetService);
-    eventEmitter = module.get<EventEmitter2>(EventEmitter2);
+    service.updateOne = jest.fn();
   });
 
   it('should handle transaction.credit event', async () => {
-    const spy = jest.spyOn(service, 'onCreditEvent');
+    const trx = transactionCreditMock;
+    const expected = trx.amount + trx.target.currentQuantity;
 
-    await eventEmitter.emitAsync(TransactionType.CREDIT, transactionCreditMock);
+    (service.updateOne as jest.Mock).mockResolvedValueOnce(trx.target);
 
-    // 3 seconds delay is needed for the event to be handled
-    setTimeout(() => {
-      expect(spy).toHaveBeenCalledWith(transactionCreditMock);
-    }, 3000);
+    // @ts-ignore
+    const affected = await service.onCreditEvent(trx);
+
+    await expect(affected.currentQuantity).toEqual(expected);
   });
 });
