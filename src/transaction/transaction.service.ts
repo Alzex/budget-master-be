@@ -66,7 +66,6 @@ export class TransactionService extends BasicCrudService<Transaction> {
     const [user, balance] = await Promise.all([
       this.usersService.findOneOrFail(ownerId),
       this.balancesService.findOneSafe(dto.balanceId, meta),
-      this.categoriesService.findOneOrFail(dto.categoryId),
     ]);
 
     if (dto.categoryId) {

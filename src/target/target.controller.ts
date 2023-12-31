@@ -36,6 +36,20 @@ export class TargetController {
     return this.targetService.find(meta);
   }
 
+  @Get(':id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: 'Returns a target',
+    type: Target,
+  })
+  findOneById(
+    @Param('id', ParseIntPipe) id: number,
+    @UserMeta() meta: UserMetadata,
+  ) {
+    return this.targetService.findOneSafe(id, meta);
+  }
+
   @Post()
   @UseGuards(AuthGuard)
   @ApiBearerAuth()

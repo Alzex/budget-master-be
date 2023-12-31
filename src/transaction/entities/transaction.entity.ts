@@ -8,7 +8,6 @@ import { Balance } from '../../balances/entities/balance.entity';
 import { Target } from '../../target/entities/target.entity';
 import { Category } from '../../category/entities/category.entity';
 import { TransactionType } from '../enums/transaction-type.enum';
-import { now } from 'moment';
 
 @Entity({
   repository: () => TransactionRepository,
@@ -40,7 +39,7 @@ export class Transaction extends BasicEntity {
   @ManyToOne(() => Target, { nullable: true })
   target: Target;
 
-  @ManyToOne(() => Category)
+  @ManyToOne(() => Category, { nullable: true })
   category: Category;
 
   @Property({ type: 'date', onCreate: () => new Date() })

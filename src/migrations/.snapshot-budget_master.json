@@ -613,7 +613,7 @@
           "unsigned": true,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "mappedType": "integer"
         },
         "created_at": {
@@ -724,6 +724,7 @@
             "id"
           ],
           "referencedTableName": "category",
+          "deleteRule": "set null",
           "updateRule": "cascade"
         }
       }
