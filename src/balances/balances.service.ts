@@ -15,7 +15,6 @@ import { UsersService } from '../users/users.service';
 import { CurrenciesService } from '../currencies/currencies.service';
 import { UserMetadata } from '../auth/types/user-metadata.type';
 import { UserRole } from '../users/enums/user-role.enum';
-import { User } from '../users/entities/user.entity';
 import { Currency } from '../currencies/entities/currency.entity';
 import { Limit } from '../limits/entities/limit.entity';
 
@@ -122,31 +121,5 @@ export class BalancesService extends BasicCrudService<Balance> {
     }
 
     return this.deleteOne(filter);
-  }
-
-  async validateDebit(
-    userId: number,
-    currencyId: number,
-    amount: number,
-  ): Promise<boolean> {
-    let result = true;
-
-    const balance = await this.findOneOrFail(
-      {
-        user: { id: userId },
-        currency: { id: currencyId },
-      },
-      {
-        populate: true,
-      },
-    );
-
-    result = balance.amount >= amount;
-
-    if (balance.limit) {
-      result = result && balance.limit.maxLoss >= amount;
-    }
-
-    return result;
   }
 }

@@ -24,9 +24,10 @@ export class CreateTransactionDto {
   @IsNumber()
   targetId: number;
 
+  @IsOptional()
   @ApiProperty()
   @IsNumber()
-  categoryId: number;
+  categoryId?: number;
 
   @ApiProperty()
   @IsBoolean()

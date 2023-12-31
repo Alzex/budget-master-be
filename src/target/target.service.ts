@@ -7,7 +7,6 @@ import { Target } from './entities/target.entity';
 import { BasicCrudService } from '../common/basic-crud.service';
 import { CreateTargetDto } from './dto/create-target.dto';
 import { UpdateTargetDto } from './dto/update-target.dto';
-import { UsersService } from '../users/users.service';
 import { UserMetadata } from '../auth/types/user-metadata.type';
 import { UserRole } from '../users/enums/user-role.enum';
 import { User } from '../users/entities/user.entity';
@@ -21,7 +20,6 @@ export class TargetService extends BasicCrudService<Target> {
     protected readonly cacheService: CacheService,
     protected readonly targetRepository: TargetRepository,
     protected readonly entityManager: EntityManager,
-    private readonly usersService: UsersService,
   ) {
     super(Target, targetRepository, cacheService, entityManager);
   }
@@ -107,7 +105,7 @@ export class TargetService extends BasicCrudService<Target> {
       target.currentQuantity = target.targetQuantity;
     }
 
-    await this.updateOne(
+    return this.updateOne(
       { id: target.id },
       { currentQuantity: target.currentQuantity },
     );
