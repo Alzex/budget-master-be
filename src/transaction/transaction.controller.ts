@@ -7,11 +7,12 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
 import { TransactionService } from './transaction.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UserMeta } from '../auth/decorator/user-meta.decorator';
 import { UserMetadata } from '../auth/types/user-metadata.type';
-import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/guards/auth.guard';
 @Controller('transaction')
 @ApiTags('transaction')

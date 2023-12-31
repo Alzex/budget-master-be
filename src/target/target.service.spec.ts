@@ -46,9 +46,9 @@ describe('TargetService', () => {
 
     await eventEmitter.emitAsync(TransactionType.CREDIT, transactionCreditMock);
 
-    // 1 second delay is needed for the event to be handled
+    // 3 seconds delay is needed for the event to be handled
     setTimeout(() => {
       expect(spy).toHaveBeenCalledWith(transactionCreditMock);
-    }, 1000);
+    }, 3000);
   });
 });
